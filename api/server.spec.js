@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
-const server = require('./server');
-const Game = require('../games/Game');
 const request = require('supertest');
+let server = require('./server');
+const Game = require('../games/Game');
 
 describe('The API Server', () => {
   beforeAll(() => {
@@ -22,58 +22,54 @@ describe('The API Server', () => {
   let gameId;
   // // hint - these wont be constants because you'll need to override them.
 
-
-  beforeEach(async() => {
-    let newGame = {
+  beforeEach(async () => {
+    //   // write a beforeEach hook that will populate your test DB with data
+    //   // each time this hook runs, you should save a document to your db
+    //   // by saving the document you'll be able to use it in each of your `it` blocks
+    let mario = {
       title: 'Super Mario Bros',
       genre: 'Platform game',
       releaseDate: 'September 13, 1985'
     }
-    testGame = Game.create(newGame);
-  
-    console.log('ID', testGame)
-    //   // write a beforeEach hook that will populate your test DB with data
-    //   // each time this hook runs, you should save a document to your db
-    //   // by saving the document you'll be able to use it in each of your `it` blocks
+    testGame = await Game.create(mario);
   });
 
   afterEach(() => {
     //   // clear the games collection.
-    // return Game.remove()
+    return Game.remove()
   });
 
-  it('runs the tests', () => {});
-// test the GET here
-  it('has a GET endpoint that return 200', async() => {
-    await request(server)
-      .get('/api/games')
-      .expect(200)
-  })
+  it('runs the tests', () => { });
 
   // test the POST here
-  it('adds a document to the database', async() => { 
+  it('should return status 201 after being saved', async () => {
     const newGame = {
-      title: 'Super Mario Bros3',
-      genre: 'Platform game',
-      releaseDate: 'September 13, 1985'
+      title: 'Duck Hunt',
+      genre: 'shooter',
+      releaseDate: 'October 18, 1985'
+    }
+    const response = await request(server)
+      .post('/api/games', newGame)
+    expect(201)
+  })
+  it('should return game data after being saved to db', async () => {
+    const newGame = {
+      title: 'Duck Hunt',
+      genre: 'shooter',
+      releaseDate: 'October 18, 1985'
     }
     const response = await request(server)
       .post('/api/games')
       .send(newGame)
-      .expect(201)
+    expect(newGame)
+    expect(response.body.title).toEqual('Duck Hunt')
   })
-  
+
+  // test the GET here
+  it('has a GET / endpoint that returns 200', async () => {
+    await request(server)
+      .get('/api/games')
+      .expect(200)
+  })
   // Test the DELETE here
-  it('should remove a game from the database', async() => {
-   let newGame = {
-      title: 'Super Mario Bros',
-      genre: 'Platform game',
-      releaseDate: 'September 13, 1985'
-    }
-    testGame = Game.create(newGame);
-    let gameId = testGame._id;
-    console.log('ID', gameId)
-    await request(server).delete(`/api/games` + gameId)
-      .expect(204)
-  })
 });
