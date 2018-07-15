@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const request = require('supertest');
-let server = require('./server');
+const server = require('./server');
 const Game = require('../games/Game');
 
 describe('The API Server', () => {
@@ -23,9 +23,7 @@ describe('The API Server', () => {
   // // hint - these wont be constants because you'll need to override them.
 
   beforeEach(async () => {
-    //   // write a beforeEach hook that will populate your test DB with data
-    //   // each time this hook runs, you should save a document to your db
-    //   // by saving the document you'll be able to use it in each of your `it` blocks
+
     let mario = {
       title: 'Super Mario Bros',
       genre: 'Platform game',
@@ -35,12 +33,10 @@ describe('The API Server', () => {
   });
 
   afterEach(() => {
-    //   // clear the games collection.
     return Game.remove()
   });
 
   it('runs the tests', () => { });
-
   // test the POST here
   it('should return status 201 after being saved', async () => {
     const newGame = {
@@ -48,7 +44,7 @@ describe('The API Server', () => {
       genre: 'shooter',
       releaseDate: 'October 18, 1985'
     }
-    const response = await request(server)
+    await request(server)
       .post('/api/games', newGame)
     expect(201)
   })
@@ -62,7 +58,18 @@ describe('The API Server', () => {
       .post('/api/games')
       .send(newGame)
     expect(newGame)
-    expect(response.body.title).toEqual('Duck Hunt')
+    expect(response.body.title).toEqual('Duck Hunt');
+  })
+  it('should return an error for an incomplete game listing', async () => {
+    const incomplete = {
+      genre: 'shooter',
+      releaseDate: 'October 18, 1985'
+    }
+   await request(server)
+      .post('/api/games')
+      .send(incomplete)
+    expect(500)
+    expect({ message: 'Error saving data to the DB' })
   })
 
   // test the GET here
@@ -71,5 +78,50 @@ describe('The API Server', () => {
       .get('/api/games')
       .expect(200)
   })
+  it('returns a list of games after a GET request', async () => {
+    const newGame = await Game.create({
+      title: 'Duck Hunt',
+      genre: 'shooter',
+      releaseDate: 'October 18, 1985'
+    })
+
+    const response = await request(server)
+      .get('/api/games')
+      .expect(200)
+    expect(response.body.length).toEqual(2)
+  })
   // Test the DELETE here
+  it('deletes a game from the database', async () => {
+    const deleteGame = await Game.create({
+      title: 'Frogger',
+      genre: 'arcade',
+      releaseDate: 'October 23, 1981'
+    })
+
+    const response = await request(server)
+      .delete(`/api/games/${deleteGame._id}`)
+    console.log(response)
+    expect(204)
+  })
+  it('returns a 404 when trying to delete a removed game', async () => {
+    const deleteGame = await Game.create({
+      title: 'Frogger',
+      genre: 'arcade',
+      releaseDate: 'October 23, 1981'
+    })
+
+    await request(server)
+      .delete(`/api/games/${deleteGame._id}`);
+    expect(204);
+
+    await request(server)
+      .delete(`/api/games/${deleteGame._id}`);
+    expect(404);
+  })
+  it('return a 422 if delete request sent without id', async() => {
+    await request(server)
+      .delete(`/api/games`);
+      expect(422);
+    expect({ message: 'You need to give me an ID' })
+  })
 });
