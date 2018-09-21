@@ -1,5 +1,6 @@
 <!-- Answers to the Short Answer Essay Questions go here -->
 
+.
 
 1. In Jest, what are the differences between beforeAll, afterAll, beforeEach, and afterEach? When do they run? What are they used for?
 beforeAll runs before the entire test suite is run.  This allows `something` to be established before the tests are run.  This could be used to start a server or create data that can be tested upon.
