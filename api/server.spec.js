@@ -26,7 +26,7 @@ describe('The API Server', () => {
 
   afterEach(() => Game.remove({}))
 
-
+  // test variables:
   let gameId
   let savedGames
 
@@ -55,6 +55,7 @@ describe('The API Server', () => {
     genre: 'Fighting',
     releaseDate: 'November 15, 2011',
   }
+
   let badGame = {
     genre: 'Fighting',
     releaseDate: 'November 15, 2011',
@@ -143,8 +144,4 @@ describe('The API Server', () => {
         .expect(500)
     })
   })
-
-
 })
-
-
