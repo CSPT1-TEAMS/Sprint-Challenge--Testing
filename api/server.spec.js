@@ -45,11 +45,11 @@ describe('The API Server', () => {
       ]
     }
 
-    let savedGames = await Promise.all(testGames.games)
+    let savedGames = await Promise.all(testGames.games.map(game => Game.create(game)))
+    console.log(savedGames)
   })
 
   afterEach(() => {
-    //   // clear the games collection.
   })
 
   it('runs the tests', () => { })
