@@ -103,7 +103,7 @@ describe('The API Server', () => {
     let gameToDelete
     let gamesInDatabase
     let id
-    let badId = { _id: 'alskjdfa;lksdjfa;' }
+    let badId = 12345
 
     beforeEach(async () => {
       gameToDelete = await request(server)
@@ -127,13 +127,24 @@ describe('The API Server', () => {
       expect(gamesInDatabase.body.length).toBe(3)
     })
 
-    it('Returns a 404 when provided a bad ID', async () => {
+    it('Returns a 404 when passed a nonexistent ID', async () => {
       await request(server)
-        .delete(`/api/games/${badId}`)
+        .delete(`/api/games/${id}`)
+
+      // try to delete already deleted game
+      await request(server)
+        .delete(`/api/games/${id}`)
         .expect(404)
     })
 
+    it('Returns a 500 when passed a malformed ID', async () => {
+      await request(server)
+        .delete(`/api/games/${badId}`)
+        .expect(500)
+    })
   })
+
+
 })
 
 
