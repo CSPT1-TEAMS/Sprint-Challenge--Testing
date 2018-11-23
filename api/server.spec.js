@@ -20,6 +20,13 @@ describe('The API Server', () => {
       .then(() => console.log('\n=== disconnected from TEST DB ==='))
   })
 
+  beforeEach(async () => {
+    savedGames = await Promise.all(testGames.games.map(game => Game.create(game)))
+  })
+
+  afterEach(() => Game.remove({}))
+
+
   let gameId
   let savedGames
 
@@ -52,12 +59,6 @@ describe('The API Server', () => {
     genre: 'Fighting',
     releaseDate: 'November 15, 2011',
   }
-
-  beforeEach(async () => {
-    savedGames = await Promise.all(testGames.games.map(game => Game.create(game)))
-  })
-
-  afterEach(() => Game.remove({}))
 
   describe('POST requests', () => {
     it('Posts a correctly formatted game', async () => {
@@ -94,8 +95,45 @@ describe('The API Server', () => {
       const games = await request(server)
         .get(`/api/games`)
 
-      console.log(games)
+      expect(games.body.length).toBe(3)
+    })
+  })
+
+  describe('DELETE requests', () => {
+    let gameToDelete
+    let gamesInDatabase
+    let id
+    let badId = { _id: 'alskjdfa;lksdjfa;' }
+
+    beforeEach(async () => {
+      gameToDelete = await request(server)
+        .post(`/api/games`)
+        .send(goodGame)
+      id = gameToDelete.body._id
+    })
+
+    it('Returns a 204 status when passed a valid ID', async () => {
+      await request(server)
+        .delete(`/api/games/${id}`)
+        .expect(204)
+    })
+
+    it('Deletes a game from the database', async () => {
+      await request(server)
+        .delete(`/api/games/${id}`)
+      gamesInDatabase = await request(server)
+        .get(`/api/games`)
+
+      expect(gamesInDatabase.body.length).toBe(3)
+    })
+
+    it('Returns a 404 when provided a bad ID', async () => {
+      await request(server)
+        .delete(`/api/games/${badId}`)
+        .expect(404)
     })
 
   })
 })
+
+
