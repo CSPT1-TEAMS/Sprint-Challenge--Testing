@@ -19,12 +19,33 @@ describe('The API Server', () => {
   })
 
   let gameId
-  // // hint - these wont be constants because you'll need to override them.
 
-  beforeEach(() => {
+  beforeEach(async () => {
     //   // write a beforeEach hook that will populate your test DB with data
     //   // each time this hook runs, you should save a document to your db
     //   // by saving the document you'll be able to use it in each of your `it` blocks
+
+    const testGames = {
+      games: [
+        {
+          title: 'X-Men vs. Street Fighter',
+          genre: 'Fighting',
+          releaseDate: 'September 25, 1996',
+        },
+        {
+          title: 'Marvel Super Heroes vs. Street Fighter',
+          genre: 'Fighting',
+          releaseDate: 'October 22, 1998',
+        },
+        {
+          title: 'Marvel vs. Capcom: Clash of the Super Heroes',
+          genre: 'Fighting',
+          releaseDate: 'January 23, 1998',
+        },
+      ]
+    }
+
+    let savedGames = await Promise.all(testGames.games)
   })
 
   afterEach(() => {
