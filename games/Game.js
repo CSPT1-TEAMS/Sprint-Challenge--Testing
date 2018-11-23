@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const { Schema } = mongoose;
+const mongoose = require('mongoose')
+const { Schema } = mongoose
 
 // This is our video game schema. Notice the two methods below
 // Notice the fields that are required when saving data to this model
@@ -14,12 +14,12 @@ const NESGameSchema = new Schema({
     required: true,
   },
   releaseDate: String,
-});
+})
 
-NESGameSchema.methods.getGameTitle = function() {
-  return this.title;
-};
+NESGameSchema.methods.getGameTitle = function () {
+  return this.title
+}
 
-const Game = mongoose.model('Game', NESGameSchema);
+const Game = mongoose.model('Game', NESGameSchema)
 
-module.exports = Game;
+module.exports = Game
